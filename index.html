@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stylish QR Generator</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+
+  <!-- QR Styling Library -->
+  <script src="https://unpkg.com/qr-code-styling/lib/qr-code-styling.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>Stylish QR Code Generator</h1>
+
+  <div class="card">
+    <label>Enter URL:</label>
+    <input id="qrLink" type="text" placeholder="https://example.com"/>
+
+    <label>Select QR Style:</label>
+    <select id="qrStyle">
+      <option value="rounded">Rounded</option>
+      <option value="dots">Dots</option>
+      <option value="classy">Classy</option>
+      <option value="heart">Heart</option>
+      <option value="circle">Circle</option>
+      <option value="tiktok">TikTok Neon</option>
+      <option value="glow">Glow Border</option>
+      <option value="transparent">Transparent</option>
+    </select>
+
+    <label>Choose Color:</label>
+    <input type="color" id="colorPicker" value="#00f2ff"/>
+
+    <label>Choose Gradient Color (optional):</label>
+    <input type="color" id="gradientPicker" value="#ff00c8"/>
+
+    <label>Upload Logo:</label>
+    <input type="file" id="logoUpload" accept="image/*"/>
+
+    <button onclick="generateQR()">Generate QR</button>
+    <button onclick="downloadPNG()">Download PNG</button>
+    <button onclick="downloadSVG()">Download SVG</button>
+  </div>
+
+  <div id="qrOutput"></div>
+</div>
+
+<script src="assets/js/script.js"></script>
+</body>
+</html>
