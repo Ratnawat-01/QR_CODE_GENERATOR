@@ -262,23 +262,24 @@ textarea:focus {
 /* placeholder square animation */
 
 .qr-placeholder {
-  width: 60px;
-  height: 60px;
-  border-radius: 18px;
+  width: 260px;          /* close to final QR size */
+  height: 260px;
+  border-radius: 24px;
   background: radial-gradient(circle at top, #22d3ee, #3b82f6);
   box-shadow:
-    0 0 25px rgba(34, 211, 238, 0.9),
-    0 0 50px rgba(59, 130, 246, 0.8);
+    0 0 35px rgba(34, 211, 238, 0.9),
+    0 0 70px rgba(59, 130, 246, 0.8);
   animation: growSquare 3s ease-out forwards;
 }
 
+
 @keyframes growSquare {
   0% {
-    transform: translateY(-40px) scale(0.15);
-    opacity: 0.3;
+    transform: translateY(-40px) scale(0.2);
+    opacity: 0.2;
   }
   40% {
-    transform: translateY(0) scale(0.5);
+    transform: translateY(0) scale(0.7);
     opacity: 0.9;
   }
   100% {
@@ -286,6 +287,7 @@ textarea:focus {
     opacity: 1;
   }
 }
+
 
 /* download + share wrapper */
 
@@ -324,6 +326,7 @@ textarea:focus {
     flex: 1 1 calc(50% - 6px);
   }
 }
+
 
 
 
