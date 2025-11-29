@@ -1,308 +1,329 @@
-let qrCode = null;
-let currentType = "url";
-let currentStyle = "basic";
-let isAnimating = false;
-
-// ---------- helpers for type & style ----------
-
-function setType(type) {
-  currentType = type;
-
-  document.querySelectorAll(".type-tab").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.type === type);
-  });
-
-  document.querySelectorAll(".type-section").forEach((sec) => {
-    sec.classList.add("hidden");
-  });
-  const activeSec = document.getElementById("section-" + type);
-  if (activeSec) activeSec.classList.remove("hidden");
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-function setStyle(style) {
-  currentStyle = style;
+/* AI gradient background */
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #111827 0, #020617 40%, #000 100%);
+  color: #e5f4ff;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 16px;
+  position: relative;
+  overflow-x: hidden;
+}
 
-  document.querySelectorAll(".style-btn").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.style === style);
-  });
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.22) 0, transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(244, 63, 94, 0.18) 0, transparent 45%);
+  filter: blur(40px);
+  opacity: 0.9;
+  z-index: -1;
+}
 
-  const colorSection = document.getElementById("color-section");
-  if (style === "colored") {
-    colorSection.classList.remove("hidden");
-  } else {
-    colorSection.classList.add("hidden");
+.container {
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  animation: fadeIn 0.7s ease-out;
+}
+
+h1 {
+  margin-bottom: 6px;
+  font-size: 32px;
+  color: #7dfcff;
+  text-shadow: 0 0 18px rgba(45, 212, 191, 0.9);
+  letter-spacing: 0.03em;
+}
+
+.subtitle {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 18px;
+}
+
+.card {
+  margin-top: 10px;
+  padding: 22px 22px 18px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85));
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow:
+    0 20px 45px rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(148, 163, 184, 0.35);
+  backdrop-filter: blur(18px);
+}
+
+.section {
+  text-align: left;
+  margin-top: 12px;
+}
+
+.label-title {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* TYPE TABS */
+
+.type-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.type-tab {
+  flex: 1 1 calc(33% - 6px);
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.7);
+  color: #e5f4ff;
+  font-size: 11px;
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: all 0.18s ease-out;
+}
+
+.type-tab.active {
+  background: radial-gradient(circle at top left, #22d3ee, #2563eb);
+  border-color: transparent;
+  color: #02101a;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+}
+
+/* inputs */
+
+label {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 9px 11px;
+  margin-top: 6px;
+  background: rgba(15, 23, 42, 0.9);
+  color: #f9fafb;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  border-radius: 10px;
+  outline: none;
+  font-size: 13px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+  background: rgba(15, 23, 42, 0.98);
+}
+
+/* URL input with paste button */
+
+.input-with-paste {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.input-with-paste input {
+  flex: 1;
+  margin-top: 0;
+}
+
+.paste-btn {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5f4ff;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.paste-btn:hover {
+  background: rgba(30, 64, 175, 0.9);
+  border-color: #38bdf8;
+  transform: translateY(-1px);
+}
+
+/* style toggle */
+
+.style-toggle {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.style-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.7);
+  color: #e5f4ff;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.18s ease-out;
+}
+
+.style-btn.active {
+  background: radial-gradient(circle at top left, #22c55e, #22d3ee);
+  border-color: transparent;
+  color: #01130c;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.7);
+}
+
+/* buttons */
+
+.buttons-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.buttons-row button,
+.download-wrapper button {
+  width: 100%;
+  padding: 11px;
+  background: linear-gradient(135deg, #22d3ee, #0ea5e9);
+  border: none;
+  color: #021018;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow:
+    0 15px 35px rgba(56, 189, 248, 0.4),
+    0 0 0 1px rgba(8, 47, 73, 0.8);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.buttons-row button:hover,
+.download-wrapper button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow:
+    0 18px 40px rgba(56, 189, 248, 0.5),
+    0 0 0 1px rgba(8, 47, 73, 0.95);
+}
+
+.buttons-row button:active,
+.download-wrapper button:active {
+  transform: translateY(0);
+  box-shadow:
+    0 8px 22px rgba(56, 189, 248, 0.35),
+    0 0 0 1px rgba(8, 47, 73, 0.9);
+}
+
+/* QR output with permanent glow */
+
+.qr-wrapper {
+  margin-top: 26px;
+  display: inline-flex;
+  padding: 16px;
+  border-radius: 24px;
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8));
+  box-shadow:
+    0 0 40px rgba(34, 211, 238, 0.8),
+    0 0 80px rgba(59, 130, 246, 0.7);
+  filter: drop-shadow(0 0 24px rgba(56, 189, 248, 0.95));
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.qr-wrapper.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* placeholder square animation */
+
+.qr-placeholder {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: radial-gradient(circle at top, #22d3ee, #3b82f6);
+  box-shadow:
+    0 0 25px rgba(34, 211, 238, 0.9),
+    0 0 50px rgba(59, 130, 246, 0.8);
+  animation: growSquare 3s ease-out forwards;
+}
+
+@keyframes growSquare {
+  0% {
+    transform: translateY(-40px) scale(0.15);
+    opacity: 0.3;
+  }
+  40% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
   }
 }
 
-// ---------- build data string based on type ----------
+/* download + share wrapper */
 
-function buildData() {
-  switch (currentType) {
-    case "url": {
-      const url = document.getElementById("input-url").value.trim();
-      return url || null;
-    }
-    case "wifi": {
-      const ssid = document.getElementById("wifi-ssid").value.trim();
-      const pass = document.getElementById("wifi-password").value.trim();
-      const enc = document.getElementById("wifi-encryption").value;
-      if (!ssid) return null;
-      const pwdPart = enc === "nopass" ? "" : `P:${pass};`;
-      return `WIFI:T:${enc};S:${ssid};${pwdPart};`;
-    }
-    case "phone": {
-      const num = document.getElementById("phone-number").value.trim();
-      return num ? `tel:${num}` : null;
-    }
-    case "email": {
-      const addr = document.getElementById("email-address").value.trim();
-      const subject = document.getElementById("email-subject").value.trim();
-      const body = document.getElementById("email-body").value.trim();
-      if (!addr) return null;
-      const params = [];
-      if (subject) params.push("subject=" + encodeURIComponent(subject));
-      if (body) params.push("body=" + encodeURIComponent(body));
-      const query = params.length ? "?" + params.join("&") : "";
-      return `mailto:${addr}${query}`;
-    }
-    case "text": {
-      const txt = document.getElementById("text-message").value.trim();
-      return txt || null;
-    }
-    case "whatsapp": {
-      const waNum = document.getElementById("wa-number").value.trim();
-      const waMsg = document.getElementById("wa-message").value.trim();
-      if (!waNum) return null;
-      const msgPart = waMsg ? `?text=${encodeURIComponent(waMsg)}` : "";
-      return `https://wa.me/${waNum.replace(/\D/g, "")}${msgPart}`;
-    }
-    case "vcard": {
-      const name = document.getElementById("vc-name").value.trim();
-      const phone = document.getElementById("vc-phone").value.trim();
-      const email = document.getElementById("vc-email").value.trim();
-      const org = document.getElementById("vc-org").value.trim();
-      if (!name && !phone && !email) return null;
-      let v = "BEGIN:VCARD\nVERSION:3.0\n";
-      v += `FN:${name}\n`;
-      if (name) v += `N:${name};;;;\n`;
-      if (phone) v += `TEL;TYPE=CELL:${phone}\n`;
-      if (email) v += `EMAIL:${email}\n`;
-      if (org) v += `ORG:${org}\n`;
-      v += "END:VCARD";
-      return v;
-    }
-    default:
-      return null;
+.download-wrapper {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* animation */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-// ---------- core QR generation (no animation) ----------
+/* responsive */
 
-function generateQRCore() {
-  const data = buildData();
-  if (!data) return false;
-
-  const color = document.getElementById("colorPicker").value;
-  const gradient = document.getElementById("gradientPicker").value;
-
-  let dotsColor = "#000000";
-  let bgColor = "#ffffff";
-  let gradientOptions = null;
-
-  if (currentStyle === "colored") {
-    dotsColor = color;
-    bgColor = "#020617";
-    gradientOptions = {
-      type: "linear",
-      rotation: 0,
-      colorStops: [
-        { offset: 0, color: color },
-        { offset: 1, color: gradient }
-      ]
-    };
+@media (max-width: 480px) {
+  .card {
+    padding: 18px 14px 14px;
   }
-
-  qrCode = new QRCodeStyling({
-    width: 300,
-    height: 300,
-    data: data,
-    dotsOptions: {
-      type: "rounded",
-      color: dotsColor,
-      gradient: gradientOptions
-    },
-    backgroundOptions: {
-      color: bgColor
-    },
-    cornersSquareOptions: {
-      type: "dot",
-      color: dotsColor
-    },
-    cornersDotOptions: {
-      color: dotsColor
-    },
-    imageOptions: {
-      crossOrigin: "anonymous",
-      margin: 6
-    }
-  });
-
-  const logoFile = document.getElementById("logoUpload").files[0];
-  if (logoFile) {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      qrCode.update({ image: event.target.result });
-      renderQR();
-    };
-    reader.readAsDataURL(logoFile);
-  } else {
-    renderQR();
-  }
-
-  if (currentType === "url") {
-    document.getElementById("input-url").value = "";
-  }
-
-  return true;
-}
-
-function renderQR() {
-  const wrapper = document.getElementById("qrOutput");
-  wrapper.innerHTML = "";
-  qrCode.append(wrapper);
-  wrapper.classList.add("visible");
-
-  const downloadWrapper = document.getElementById("downloadWrapper");
-  downloadWrapper.classList.remove("hidden");
-
-  // 🔥 After QR is fully placed, scroll so that
-  // QR + Download + Share buttons are clearly visible
-  downloadWrapper.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-}
-
-
-// ---------- generate click: 3s square grow + auto scroll ----------
-
-function handleGenerateClick() {
-  if (isAnimating) return;
-
-  const data = buildData();
-  if (!data) {
-    alert("Please fill the required fields for the selected QR type.");
-    return;
-  }
-
-  isAnimating = true;
-
-  const wrapper = document.getElementById("qrOutput");
-  const downloadWrapper = document.getElementById("downloadWrapper");
-
-  wrapper.classList.remove("visible");
-  wrapper.innerHTML = "";
-  downloadWrapper.classList.add("hidden");
-
-  const placeholder = document.createElement("div");
-  placeholder.className = "qr-placeholder";
-  wrapper.appendChild(placeholder);
-  wrapper.classList.add("visible");
-
-  // scroll so user always sees animation
-  wrapper.scrollIntoView({ behavior: "smooth", block: "center" });
-
-  setTimeout(() => {
-    const ok = generateQRCore();
-    if (!ok) {
-      wrapper.innerHTML = "";
-      wrapper.classList.remove("visible");
-      downloadWrapper.classList.add("hidden");
-    }
-    isAnimating = false;
-  }, 3000);
-}
-
-// ---------- download & share ----------
-
-function downloadPNG() {
-  if (!qrCode) {
-    alert("Generate a QR first.");
-    return;
-  }
-  qrCode.download({ extension: "png" });
-}
-
-async function shareQR() {
-  if (!qrCode) {
-    alert("Generate a QR first.");
-    return;
-  }
-
-  if (!navigator.share || !navigator.canShare) {
-    alert("Sharing is not supported on this browser. Please download the QR and share manually.");
-    return;
-  }
-
-  try {
-    const blob = await qrCode.getRawData("png");
-    const file = new File([blob], "qr-code.png", { type: "image/png" });
-
-    if (!navigator.canShare({ files: [file] })) {
-      alert("Your device cannot share this file. Please download and share manually.");
-      return;
-    }
-
-    await navigator.share({
-      files: [file],
-      title: "QR Code",
-      text: "Here is your QR code."
-    });
-  } catch (err) {
-    console.error(err);
-    alert("Couldn't open share sheet. You can still download and share manually.");
+  .type-tab {
+    flex: 1 1 calc(50% - 6px);
   }
 }
 
-// ---------- paste button ----------
-
-async function handlePasteClick() {
-  const input = document.getElementById("input-url");
-  try {
-    if (navigator.clipboard && navigator.clipboard.readText) {
-      const text = await navigator.clipboard.readText();
-      if (text) input.value = text;
-    } else {
-      alert("Clipboard access is not supported in this browser.");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Unable to read from clipboard. Please paste manually (Ctrl+V).");
-  }
-}
-
-// ---------- initial bindings ----------
-
-document.addEventListener("DOMContentLoaded", () => {
-  // type tabs
-  document.querySelectorAll(".type-tab").forEach((btn) => {
-    btn.addEventListener("click", () => setType(btn.dataset.type));
-  });
-
-  // style buttons
-  document.querySelectorAll(".style-btn").forEach((btn) => {
-    btn.addEventListener("click", () => setStyle(btn.dataset.style));
-  });
-
-  // buttons
-  document.getElementById("btn-generate").addEventListener("click", handleGenerateClick);
-  document.getElementById("btn-download").addEventListener("click", downloadPNG);
-  document.getElementById("btn-share").addEventListener("click", shareQR);
-  document.getElementById("btn-paste").addEventListener("click", handlePasteClick);
-
-  // defaults
-  setType("url");
-  setStyle("basic");
-});
 
 
