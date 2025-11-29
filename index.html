@@ -3,48 +3,137 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Stylish QR Generator</title>
+  <title>Stylish QR Code Generator</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
 
   <!-- QR Styling Library -->
-  <script src="https://unpkg.com/qr-code-styling/lib/qr-code-styling.js"></script>
+  <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
 </head>
 <body>
 
+<div class="bg-gradient"></div>
+
 <div class="container">
   <h1>Stylish QR Code Generator</h1>
+  <p class="subtitle">AI-style glass UI • Lifetime QR codes • No expiry</p>
 
   <div class="card">
-    <label>Enter URL:</label>
-    <input id="qrLink" type="text" placeholder="https://example.com"/>
 
-    <label>Select QR Style:</label>
-    <select id="qrStyle">
-      <option value="rounded">Rounded</option>
-      <option value="dots">Dots</option>
-      <option value="classy">Classy</option>
-      <option value="heart">Heart</option>
-      <option value="circle">Circle</option>
-      <option value="tiktok">TikTok Neon</option>
-      <option value="glow">Glow Border</option>
-      <option value="transparent">Transparent</option>
-    </select>
+    <!-- QR DATA TYPE TABS -->
+    <div class="section">
+      <label class="label-title">QR Type</label>
+      <div class="type-tabs">
+        <button class="type-tab active" data-type="url">Link</button>
+        <button class="type-tab" data-type="wifi">WiFi</button>
+        <button class="type-tab" data-type="phone">Phone</button>
+        <button class="type-tab" data-type="email">Email</button>
+        <button class="type-tab" data-type="text">Text</button>
+        <button class="type-tab" data-type="whatsapp">WhatsApp</button>
+        <button class="type-tab" data-type="vcard">vCard</button>
+      </div>
+    </div>
 
-    <label>Choose Color:</label>
-    <input type="color" id="colorPicker" value="#00f2ff"/>
+    <!-- URL -->
+    <div class="section type-section" id="section-url">
+      <label>Enter URL:</label>
+      <input id="input-url" type="text" placeholder="https://example.com"/>
+    </div>
 
-    <label>Choose Gradient Color (optional):</label>
-    <input type="color" id="gradientPicker" value="#ff00c8"/>
+    <!-- WiFi -->
+    <div class="section type-section hidden" id="section-wifi">
+      <label>WiFi Name (SSID):</label>
+      <input id="wifi-ssid" type="text" placeholder="MyWiFi"/>
+      <label>Password:</label>
+      <input id="wifi-password" type="text" placeholder="••••••••"/>
+      <label>Encryption:</label>
+      <select id="wifi-encryption">
+        <option value="WPA">WPA/WPA2</option>
+        <option value="WEP">WEP</option>
+        <option value="nopass">No Password</option>
+      </select>
+    </div>
 
-    <label>Upload Logo:</label>
-    <input type="file" id="logoUpload" accept="image/*"/>
+    <!-- Phone -->
+    <div class="section type-section hidden" id="section-phone">
+      <label>Phone Number:</label>
+      <input id="phone-number" type="text" placeholder="+91XXXXXXXXXX"/>
+    </div>
 
-    <button onclick="generateQR()">Generate QR</button>
-    <button onclick="downloadPNG()">Download PNG</button>
-    <button onclick="downloadSVG()">Download SVG</button>
+    <!-- Email -->
+    <div class="section type-section hidden" id="section-email">
+      <label>Email Address:</label>
+      <input id="email-address" type="email" placeholder="you@example.com"/>
+      <label>Subject:</label>
+      <input id="email-subject" type="text" placeholder="Hello"/>
+      <label>Message:</label>
+      <textarea id="email-body" rows="2" placeholder="Your message"></textarea>
+    </div>
+
+    <!-- Text -->
+    <div class="section type-section hidden" id="section-text">
+      <label>Custom Text:</label>
+      <textarea id="text-message" rows="3" placeholder="Write any text..."></textarea>
+    </div>
+
+    <!-- WhatsApp -->
+    <div class="section type-section hidden" id="section-whatsapp">
+      <label>WhatsApp Number:</label>
+      <input id="wa-number" type="text" placeholder="+91XXXXXXXXXX"/>
+      <label>Message:</label>
+      <textarea id="wa-message" rows="2" placeholder="Type the message to send"></textarea>
+    </div>
+
+    <!-- vCard -->
+    <div class="section type-section hidden" id="section-vcard">
+      <label>Full Name:</label>
+      <input id="vc-name" type="text" placeholder="Your Name"/>
+      <label>Phone:</label>
+      <input id="vc-phone" type="text" placeholder="+91XXXXXXXXXX"/>
+      <label>Email:</label>
+      <input id="vc-email" type="email" placeholder="you@example.com"/>
+      <label>Organisation (optional):</label>
+      <input id="vc-org" type="text" placeholder="Company / College"/>
+    </div>
+
+    <!-- STYLE: BASIC vs COLOURED -->
+    <div class="section">
+      <label class="label-title">QR Style</label>
+      <div class="style-toggle">
+        <button class="style-btn active" data-style="basic">Basic (B&W)</button>
+        <button class="style-btn" data-style="colored">Coloured</button>
+      </div>
+    </div>
+
+    <!-- COLORS (only visible for coloured) -->
+    <div class="section color-section hidden" id="color-section">
+      <label>Choose Color:</label>
+      <input type="color" id="colorPicker" value="#00f2ff"/>
+
+      <label>Choose Gradient Color (optional):</label>
+      <input type="color" id="gradientPicker" value="#ff00c8"/>
+    </div>
+
+    <!-- LOGO UPLOAD -->
+    <div class="section">
+      <label>Add logo (optional):</label>
+      <input type="file" id="logoUpload" accept="image/*"/>
+    </div>
+
+    <!-- ONLY GENERATE BUTTON INSIDE CARD -->
+    <div class="section buttons-row">
+      <button id="btn-generate">
+        <span class="btn-label">Generate QR</span>
+      </button>
+    </div>
   </div>
 
-  <div id="qrOutput"></div>
+  <!-- QR + ACTION BUTTONS BELOW CARD -->
+  <div id="qrOutput" class="qr-wrapper"></div>
+
+  <div id="downloadWrapper" class="download-wrapper hidden">
+    <button id="btn-download"><span class="btn-label">Download QR Code</span></button>
+    <button id="btn-share"><span class="btn-label">Share QR Code</span></button>
+  </div>
 </div>
 
 <script src="assets/js/script.js"></script>
