@@ -159,7 +159,6 @@ function generateQRCore() {
     renderQR();
   }
 
-  // clear URL input only
   if (currentType === "url") {
     document.getElementById("input-url").value = "";
   }
@@ -175,9 +174,17 @@ function renderQR() {
 
   const downloadWrapper = document.getElementById("downloadWrapper");
   downloadWrapper.classList.remove("hidden");
+
+  // 🔥 After QR is fully placed, scroll so that
+  // QR + Download + Share buttons are clearly visible
+  downloadWrapper.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
 }
 
-// ---------- generate click: 3s square grow animation ----------
+
+// ---------- generate click: 3s square grow + auto scroll ----------
 
 function handleGenerateClick() {
   if (isAnimating) return;
@@ -193,18 +200,18 @@ function handleGenerateClick() {
   const wrapper = document.getElementById("qrOutput");
   const downloadWrapper = document.getElementById("downloadWrapper");
 
-  // reset QR + buttons
   wrapper.classList.remove("visible");
   wrapper.innerHTML = "";
   downloadWrapper.classList.add("hidden");
 
-  // add placeholder square and show wrapper
   const placeholder = document.createElement("div");
   placeholder.className = "qr-placeholder";
   wrapper.appendChild(placeholder);
   wrapper.classList.add("visible");
 
-  // after 3 seconds, replace with actual QR
+  // scroll so user always sees animation
+  wrapper.scrollIntoView({ behavior: "smooth", block: "center" });
+
   setTimeout(() => {
     const ok = generateQRCore();
     if (!ok) {
@@ -233,7 +240,7 @@ async function shareQR() {
   }
 
   if (!navigator.share || !navigator.canShare) {
-    alert("Sharing is not supported on this browser. Download the QR and share it manually.");
+    alert("Sharing is not supported on this browser. Please download the QR and share manually.");
     return;
   }
 
@@ -257,6 +264,37 @@ async function shareQR() {
   }
 }
 
+// ---------- paste button ----------
+
+async function handlePasteClick() {
+  const input = document.getElementById("input-url");
+
+  // Clipboard API only works reliably on HTTPS or localhost
+  if (!navigator.clipboard || !window.isSecureContext) {
+    alert(
+      "Paste button works best on HTTPS or localhost. Please paste manually (Ctrl+V / long-press → Paste)."
+    );
+    input.focus();
+    return;
+  }
+
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text) {
+      alert("Clipboard is empty. Copy a link first, then tap Paste.");
+      return;
+    }
+    input.value = text;
+  } catch (err) {
+    console.error(err);
+    alert(
+      "Browser blocked clipboard access. Please paste manually (Ctrl+V / long-press → Paste)."
+    );
+    input.focus();
+  }
+}
+
+
 // ---------- initial bindings ----------
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -274,9 +312,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-generate").addEventListener("click", handleGenerateClick);
   document.getElementById("btn-download").addEventListener("click", downloadPNG);
   document.getElementById("btn-share").addEventListener("click", shareQR);
+  document.getElementById("btn-paste").addEventListener("click", handlePasteClick);
 
   // defaults
   setType("url");
   setStyle("basic");
 });
-
