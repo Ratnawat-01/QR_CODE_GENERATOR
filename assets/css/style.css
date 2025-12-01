@@ -147,6 +147,99 @@ textarea:focus {
   margin-top: 0;
 }
 
+/* Modern file input (glass + neon) */
+.file-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+  position: relative;
+}
+
+/* visually hide native input but keep it accessible */
+.file-input input[type="file"] {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* main upload button */
+.file-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(34,211,238,0.14), rgba(56,189,248,0.14));
+  border: 1px solid rgba(56,189,248,0.18);
+  color: #e6fcff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+  box-shadow: 0 6px 20px rgba(12, 85, 110, 0.18), inset 0 -1px 0 rgba(255,255,255,0.02);
+}
+
+.file-btn svg { color: #6ee7ff; opacity: 0.95; }
+
+.file-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(12,85,110,0.28), 0 0 18px rgba(34,211,238,0.06);
+}
+
+/* filename text */
+.file-name {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(148,163,184,0.06);
+  color: #cfeff7;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* clear button (small x) */
+.file-clear {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #ffd6d6;
+  padding: 6px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background .12s ease, transform .08s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-clear:hover {
+  background: rgba(255,255,255,0.03);
+  transform: translateY(-1px);
+}
+
+/* hidden class helper */
+.file-clear.hidden { display: none; }
+
+/* focus accessibility */
+.file-btn:focus,
+.file-clear:focus {
+  outline: 2px solid rgba(34,211,238,0.28);
+  outline-offset: 2px;
+}
+
+/* responsive tweak */
+@media (max-width: 480px) {
+  .file-name { font-size: 12px; }
+  .file-btn { padding: 9px 12px; }
+}
+
+
 .paste-btn {
   padding: 8px 12px;
   border-radius: 999px;
@@ -327,6 +420,14 @@ textarea:focus {
   }
 }
 
+.invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.5) !important;
+}
 
-
-
+.error-msg {
+  margin-top: 4px;
+  color: #f87171;
+  font-size: 12px;
+  opacity: 0.9;
+}
